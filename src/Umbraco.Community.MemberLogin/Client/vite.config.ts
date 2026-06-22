@@ -12,6 +12,11 @@ export default defineConfig({
     sourcemap: true,
     rollupOptions: {
       external: [/^@umbraco-cms\//],
+      output: {
+        // Stable chunk names so dynamic-import manifest entries and committed
+        // build output don't churn on every rebuild.
+        chunkFileNames: "[name].js",
+      },
     },
   },
 });

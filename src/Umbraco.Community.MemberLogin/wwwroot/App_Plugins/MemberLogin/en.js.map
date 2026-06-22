@@ -1,0 +1,1 @@
+{"version":3,"file":"en.js","sources":["../../../Client/src/lang/en.ts"],"sourcesContent":["export default {\n  memberLogin: {\n    action: \"Login as Member\",\n  },\n};\n"],"names":["en"],"mappings":"AAAA,MAAAA,IAAe;AAAA,EACb,aAAa;AAAA,IACX,QAAQ;AAAA,EAAA;AAEZ;"}

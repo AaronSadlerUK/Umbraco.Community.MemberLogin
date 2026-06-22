@@ -1,0 +1,15 @@
+{
+  "$schema": "../../umbraco-package-schema.json",
+  "id": "Umbraco.Community.MemberLogin",
+  "name": "Member Login",
+  "version": "1.0.0",
+  "allowTelemetry": true,
+  "extensions": [
+    {
+      "name": "Member Login Bundle",
+      "alias": "MemberLogin.Bundle",
+      "type": "bundle",
+      "js": "/App_Plugins/MemberLogin/member-login.js"
+    }
+  ]
+}
