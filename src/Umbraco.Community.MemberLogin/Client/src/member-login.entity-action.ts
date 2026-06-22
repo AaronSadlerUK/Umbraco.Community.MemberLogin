@@ -2,10 +2,13 @@ import { UmbEntityActionBase } from "@umbraco-cms/backoffice/entity-action";
 import { UMB_MODAL_MANAGER_CONTEXT } from "@umbraco-cms/backoffice/modal";
 import { UMB_NOTIFICATION_CONTEXT } from "@umbraco-cms/backoffice/notification";
 import { UmbMemberItemRepository } from "@umbraco-cms/backoffice/member";
+import { UmbLocalizationController } from "@umbraco-cms/backoffice/localization-api";
 import { MEMBER_LOGIN_MODAL } from "./member-login-modal.token.js";
 import { V1 } from "./api/index.js";
 
 export class MemberLoginEntityAction extends UmbEntityActionBase<never> {
+  #localize = new UmbLocalizationController(this);
+
   async execute() {
     const unique = this.args.unique;
     if (!unique) return;
@@ -15,48 +18,39 @@ export class MemberLoginEntityAction extends UmbEntityActionBase<never> {
     const { data } = await itemRepository.requestItems([unique]);
     const memberName = data?.[0]?.name ?? "member";
 
-    // Open the target window synchronously on the user gesture so it is not
-    // blocked as a popup after the awaited API call below.
-    const win = window.open("", "_blank");
-
     const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-    if (!modalManager) {
-      win?.close();
-      return;
-    }
+    if (!modalManager) return;
 
     const modal = modalManager.open(this, MEMBER_LOGIN_MODAL, { data: { memberName } });
 
+    let value;
     try {
-      const value = await modal.onSubmit();
-
-      const { data: result } = await V1.postUmbracoManagementApiV1MemberLoginLogin({
-        body: {
-          memberKey: unique,
-          contentKey: value.contentKey ?? null,
-          culture: value.culture ?? null,
-        },
-      });
-
-      if (result?.redirectUrl && win) {
-        win.location.href = result.redirectUrl;
-      } else {
-        win?.close();
-        await this.#notifyError();
-      }
+      value = await modal.onSubmit();
     } catch {
-      // Modal cancelled or the API call failed.
-      win?.close();
+      return; // modal cancelled
+    }
+
+    const { data: result, error } = await V1.postUmbracoManagementApiV1MemberLoginLogin({
+      body: {
+        memberKey: unique,
+        contentKey: value.contentKey ?? null,
+        culture: value.culture ?? null,
+      },
+    });
+
+    if (result?.redirectUrl) {
+      window.open(result.redirectUrl, "_blank");
+    } else {
+      await this.#notifyError(error);
     }
   }
 
-  async #notifyError() {
+  async #notifyError(error: unknown) {
     const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+    const problem = error as { detail?: string; title?: string } | undefined;
+    const message = problem?.detail ?? problem?.title ?? this.#localize.term("memberLogin_errorMessage");
     notificationContext?.peek("danger", {
-      data: {
-        headline: "Member login failed",
-        message: "Could not sign in as this member. The redirect page may not be published.",
-      },
+      data: { headline: this.#localize.term("memberLogin_errorHeadline"), message },
     });
   }
 }

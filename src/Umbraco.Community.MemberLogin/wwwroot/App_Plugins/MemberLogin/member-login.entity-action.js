@@ -1,15 +1,22 @@
 import { UmbEntityActionBase as l } from "@umbraco-cms/backoffice/entity-action";
-import { UmbModalToken as d, UMB_MODAL_MANAGER_CONTEXT as b } from "@umbraco-cms/backoffice/modal";
+import { UmbModalToken as b, UMB_MODAL_MANAGER_CONTEXT as p } from "@umbraco-cms/backoffice/modal";
 import { UMB_NOTIFICATION_CONTEXT as u } from "@umbraco-cms/backoffice/notification";
-import { UmbMemberItemRepository as p } from "@umbraco-cms/backoffice/member";
-import { c as g } from "./client.gen.js";
-const M = new d(
+import { UmbMemberItemRepository as d } from "@umbraco-cms/backoffice/member";
+import { UmbLocalizationController as g } from "@umbraco-cms/backoffice/localization-api";
+import { c as M } from "./client.gen.js";
+const y = new b(
   "MemberLogin.Modal",
   { modal: { type: "sidebar", size: "small" } }
 );
-class y {
+class h {
   static postUmbracoManagementApiV1MemberLoginLogin(e) {
-    return (e?.client ?? g).post({
+    return (e?.client ?? M).post({
+      security: [
+        {
+          scheme: "bearer",
+          type: "http"
+        }
+      ],
       url: "/umbraco/management/api/v1/member-login/login",
       ...e,
       headers: {
@@ -19,40 +26,38 @@ class y {
     });
   }
 }
-class L extends l {
+class C extends l {
+  #e = new g(this);
   async execute() {
     const e = this.args.unique;
     if (!e) return;
-    const r = new p(this), { data: s } = await r.requestItems([e]), m = s?.[0]?.name ?? "member", t = window.open("", "_blank"), n = await this.getContext(b);
-    if (!n) {
-      t?.close();
+    const r = new d(this), { data: t } = await r.requestItems([e]), o = t?.[0]?.name ?? "member", a = await this.getContext(p);
+    if (!a) return;
+    const s = a.open(this, y, { data: { memberName: o } });
+    let n;
+    try {
+      n = await s.onSubmit();
+    } catch {
       return;
     }
-    const c = n.open(this, M, { data: { memberName: m } });
-    try {
-      const o = await c.onSubmit(), { data: a } = await y.postUmbracoManagementApiV1MemberLoginLogin({
-        body: {
-          memberKey: e,
-          contentKey: o.contentKey ?? null,
-          culture: o.culture ?? null
-        }
-      });
-      a?.redirectUrl && t ? t.location.href = a.redirectUrl : (t?.close(), await this.#e());
-    } catch {
-      t?.close();
-    }
-  }
-  async #e() {
-    (await this.getContext(u))?.peek("danger", {
-      data: {
-        headline: "Member login failed",
-        message: "Could not sign in as this member. The redirect page may not be published."
+    const { data: i, error: c } = await h.postUmbracoManagementApiV1MemberLoginLogin({
+      body: {
+        memberKey: e,
+        contentKey: n.contentKey ?? null,
+        culture: n.culture ?? null
       }
+    });
+    i?.redirectUrl ? window.open(i.redirectUrl, "_blank") : await this.#t(c);
+  }
+  async #t(e) {
+    const r = await this.getContext(u), t = e, o = t?.detail ?? t?.title ?? this.#e.term("memberLogin_errorMessage");
+    r?.peek("danger", {
+      data: { headline: this.#e.term("memberLogin_errorHeadline"), message: o }
     });
   }
 }
 export {
-  L as MemberLoginEntityAction,
-  L as default
+  C as MemberLoginEntityAction,
+  C as default
 };
 //# sourceMappingURL=member-login.entity-action.js.map

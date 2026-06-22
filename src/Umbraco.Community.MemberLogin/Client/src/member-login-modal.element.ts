@@ -79,48 +79,48 @@ export class MemberLoginModalElement extends UmbModalBaseElement<
 
   render() {
     return html`
-      <umb-body-layout headline="Login as Member">
+      <umb-body-layout headline=${this.localize.term("memberLogin_headline")}>
         <uui-box>
-          <p>
-            You are about to login as member
-            <strong>${this.data?.memberName ?? ""}</strong>.
-          </p>
+          <p>${this.localize.term("memberLogin_confirm", this.data?.memberName)}</p>
 
           ${this._languages.length > 1
             ? html`
-                <uui-label for="culture">Culture</uui-label>
+                <uui-label for="culture">${this.localize.term("memberLogin_culture")}</uui-label>
                 <uui-select
                   id="culture"
-                  label="Culture"
+                  label=${this.localize.term("memberLogin_culture")}
                   .options=${this._languages}
                   @change=${this.#onCultureChange}></uui-select>
               `
             : nothing}
 
-          <uui-label>Redirect page</uui-label>
+          <uui-label>${this.localize.term("memberLogin_redirectPage")}</uui-label>
           ${this._pageName
             ? html`
                 <uui-ref-node name=${this._pageName} standalone>
                   <uui-action-bar slot="actions">
-                    <uui-button label="Remove" @click=${this.#removePage}>Remove</uui-button>
+                    <uui-button
+                      label=${this.localize.term("memberLogin_remove")}
+                      @click=${this.#removePage}></uui-button>
                   </uui-action-bar>
                 </uui-ref-node>
               `
             : html`
-                <uui-button look="placeholder" label="Add" @click=${this.#pickPage}>Add</uui-button>
-                <small>You will be redirected to the root page '/' of the website.</small>
+                <uui-button
+                  look="placeholder"
+                  label=${this.localize.term("memberLogin_add")}
+                  @click=${this.#pickPage}></uui-button>
+                <small>${this.localize.term("memberLogin_rootHint")}</small>
               `}
         </uui-box>
 
         <div slot="actions">
-          <uui-button label="Cancel" @click=${this._rejectModal}>Cancel</uui-button>
+          <uui-button label=${this.localize.term("general_cancel")} @click=${this._rejectModal}></uui-button>
           <uui-button
             color="positive"
             look="primary"
-            label="Login as Member"
-            @click=${this.#submit}>
-            Login as Member
-          </uui-button>
+            label=${this.localize.term("memberLogin_submit")}
+            @click=${this.#submit}></uui-button>
         </div>
       </umb-body-layout>
     `;

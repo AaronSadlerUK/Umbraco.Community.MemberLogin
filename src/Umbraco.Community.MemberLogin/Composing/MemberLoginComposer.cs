@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Umbraco.Cms.Api.Common.OpenApi;
+using Umbraco.Cms.Api.Management.OpenApi;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Community.MemberLogin.Services;
@@ -20,6 +21,15 @@ public class MemberLoginComposer : IComposer
     }
 }
 
+/// <summary>
+/// Applies the backoffice bearer-token security requirement to the member-login API
+/// operations, so the generated OpenAPI client attaches the Authorization header.
+/// </summary>
+public class MemberLoginSecurityFilter : BackOfficeSecurityRequirementsOperationFilterBase
+{
+    protected override string ApiName => Constants.ApiName;
+}
+
 public class MemberLoginSchemaIdHandler : SchemaIdHandler
 {
     public override bool CanHandle(Type type)
@@ -29,7 +39,10 @@ public class MemberLoginSchemaIdHandler : SchemaIdHandler
 public class MemberLoginSwaggerGenOptions : IConfigureOptions<SwaggerGenOptions>
 {
     public void Configure(SwaggerGenOptions options)
-        => options.SwaggerDoc(
+    {
+        options.SwaggerDoc(
             Constants.ApiName,
             new OpenApiInfo { Title = "Member Login API", Version = "1.0" });
+        options.OperationFilter<MemberLoginSecurityFilter>();
+    }
 }

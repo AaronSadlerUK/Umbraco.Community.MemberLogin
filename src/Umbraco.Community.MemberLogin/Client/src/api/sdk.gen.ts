@@ -21,6 +21,12 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
 export class V1 {
     public static postUmbracoManagementApiV1MemberLoginLogin<ThrowOnError extends boolean = false>(options?: Options<PostUmbracoManagementApiV1MemberLoginLoginData, ThrowOnError>) {
         return (options?.client ?? client).post<PostUmbracoManagementApiV1MemberLoginLoginResponses, PostUmbracoManagementApiV1MemberLoginLoginErrors, ThrowOnError>({
+            security: [
+                {
+                    scheme: 'bearer',
+                    type: 'http'
+                }
+            ],
             url: '/umbraco/management/api/v1/member-login/login',
             ...options,
             headers: {

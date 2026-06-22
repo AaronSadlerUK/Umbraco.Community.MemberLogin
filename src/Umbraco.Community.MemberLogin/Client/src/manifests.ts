@@ -34,9 +34,9 @@ const modal = {
 
 const englishLang = {
   type: "localization",
-  alias: "MemberLogin.Lang.EnGb",
-  name: "English (UK)",
-  meta: { culture: "en-gb" },
+  alias: "MemberLogin.Lang.En",
+  name: "English",
+  meta: { culture: "en" },
   js: () => import("./lang/en.js"),
 };
 

@@ -27,9 +27,9 @@ const i = {
   js: () => import("./member-login-modal.element.js")
 }, e = {
   type: "localization",
-  alias: "MemberLogin.Lang.EnGb",
-  name: "English (UK)",
-  meta: { culture: "en-gb" },
+  alias: "MemberLogin.Lang.En",
+  name: "English",
+  meta: { culture: "en" },
   js: () => import("./en.js")
 }, m = [i, t, o, e];
 export {
