@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Umbraco.Community.MemberLogin</RootNamespace>
+
+    <!-- NuGet metadata -->
+    <PackageId>Umbraco.Community.MemberLogin</PackageId>
+    <Title>Umbraco Member Login</Title>
+    <Description>Sign in to the front-end as a member from the Umbraco backoffice, with optional culture and redirect page, opening in a new tab.</Description>
+    <Authors>Aaron Sadler</Authors>
+    <PackageTags>umbraco umbraco-marketplace member impersonation login</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <Version>1.0.0</Version>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Umbraco.Cms.Api.Management" Version="17.0.2" />
+    <PackageReference Include="Umbraco.Cms.Api.Common" Version="17.0.2" />
+    <PackageReference Include="Umbraco.Cms.Web.Common" Version="17.0.2" />
+    <PackageReference Include="Umbraco.Cms.Web.Website" Version="17.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <!-- Keep TS client tooling out of the C# compile/pack -->
+  <ItemGroup>
+    <Compile Remove="Client\**" />
+    <Content Remove="Client\**" />
+    <None Remove="Client\**" />
+  </ItemGroup>
+
+</Project>
