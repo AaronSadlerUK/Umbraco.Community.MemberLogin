@@ -1,0 +1,17 @@
+{
+    "$schema": "https://marketplace.umbraco.com/umbraco-marketplace-schema.json",
+
+    "AuthorDetails": {
+        "Description": "Aaron is an Umbraco Certifiied master who has been working with Umbraco since early V7",
+        "Url": "https://aaronsadler.dev"
+    },
+    "Category": "Editor Tools",
+    "IssueTrackerUrl": "https://github.com/AaronSadlerUK/Umbraco.Community.MemberLogin/issues",
+    "LicenseTypes": ["Free"],
+    "PackageType": "Package",
+    "Tags": [
+        "Impersonate Member",
+        "Login as Member",
+        "Member Impersonation"
+    ]
+}
