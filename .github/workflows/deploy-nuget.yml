@@ -48,6 +48,23 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: src/Umbraco.Community.MemberLogin/Client/package-lock.json
+
+      # Build the backoffice client fresh from the committed TS source so the
+      # packaged wwwroot assets always match source. The OpenAPI client is
+      # already committed (src/api/*.gen.ts), so no running Umbraco site is
+      # needed here — this is a self-contained vite build.
+      - name: Build client
+        working-directory: src/Umbraco.Community.MemberLogin/Client
+        run: |
+          npm ci
+          npm run build
+
       - name: Derive version from tag
         id: version
         run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
