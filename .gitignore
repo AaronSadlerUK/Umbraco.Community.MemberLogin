@@ -2,3 +2,6 @@ bin/
 obj/
 node_modules/
 *.user
+
+# Vite build output (produced by `npm run build` / CI before pack)
+src/Umbraco.Community.MemberLogin/wwwroot/App_Plugins/MemberLogin/

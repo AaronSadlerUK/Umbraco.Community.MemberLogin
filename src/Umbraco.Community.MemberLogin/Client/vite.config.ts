@@ -11,12 +11,11 @@ export default defineConfig({
     emptyOutDir: true,
     sourcemap: true,
     rollupOptions: {
-      external: [/^@umbraco-cms\//],
-      output: {
-        // Stable chunk names so dynamic-import manifest entries and committed
-        // build output don't churn on every rebuild.
-        chunkFileNames: "[name].js",
-      },
+      external: [/^@umbraco-cms\//], // don't bundle the backoffice itself
     },
   },
+  // Absolute base so Vite's default content-hashed chunk filenames
+  // (e.g. entrypoint-a1b2c3.js) resolve under App_Plugins in the backoffice.
+  // The hashes are what bust the browser cache between releases.
+  base: "/App_Plugins/MemberLogin/",
 });
