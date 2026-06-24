@@ -1,4 +1,5 @@
 import { UMB_MEMBER_ENTITY_TYPE } from "@umbraco-cms/backoffice/member";
+import { MEMBER_LOGIN_SENSITIVE_DATA_CONDITION_ALIAS } from "./member-login.sensitive-data.condition.constants.js";
 
 const entrypoint = {
   type: "backofficeEntryPoint",
@@ -21,8 +22,15 @@ const entityAction = {
   },
   conditions: [
     { alias: "Umb.Condition.SectionAlias", match: "Umb.Section.Members" },
-    { alias: "Umb.Condition.CurrentUser.HasAccessToSensitiveData" },
+    { alias: MEMBER_LOGIN_SENSITIVE_DATA_CONDITION_ALIAS },
   ],
+};
+
+const sensitiveDataCondition = {
+  type: "condition",
+  name: "Member Login: Current User Has Access To Sensitive Data Condition",
+  alias: MEMBER_LOGIN_SENSITIVE_DATA_CONDITION_ALIAS,
+  api: () => import("./member-login.sensitive-data.condition.js"),
 };
 
 const modal = {
@@ -40,4 +48,4 @@ const englishLang = {
   js: () => import("./lang/en.js"),
 };
 
-export const manifests = [entrypoint, entityAction, modal, englishLang];
+export const manifests = [entrypoint, entityAction, sensitiveDataCondition, modal, englishLang];
