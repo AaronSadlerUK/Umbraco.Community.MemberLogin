@@ -1,0 +1,85 @@
+name: Deploy to NuGet
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+env:
+  DOTNET_VERSION: '10.0.x'
+  TEST_PROJECT: test/Umbraco.Community.MemberLogin.Tests/Umbraco.Community.MemberLogin.Tests.csproj
+  PACK_PROJECT: src/Umbraco.Community.MemberLogin/Umbraco.Community.MemberLogin.csproj
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore ${{ env.TEST_PROJECT }}
+
+      - name: Build
+        run: dotnet build ${{ env.TEST_PROJECT }} --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test ${{ env.TEST_PROJECT }} --configuration Release --no-build --verbosity normal
+
+  deploy:
+    name: Pack, push & release
+    needs: test # tests must pass before anything is published
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write # request the OIDC token for NuGet Trusted Publishing
+      contents: write # create the GitHub release
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Derive version from tag
+        id: version
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Pack
+        run: >
+          dotnet pack ${{ env.PACK_PROJECT }}
+          --configuration Release
+          -p:Version=${{ steps.version.outputs.version }}
+          -p:ContinuousIntegrationBuild=true
+          --output ${{ github.workspace }}/artifacts
+
+      # Trusted Publishing: exchange the GitHub OIDC token for a short-lived
+      # (1 hour) nuget.org API key. Done right before the push so it can't expire.
+      - name: NuGet login (OIDC → temporary API key)
+        id: nuget-login
+        uses: NuGet/login@v1
+        with:
+          user: ${{ secrets.NUGET_USER }} # nuget.org username (profile name), not your email
+
+      - name: Push to NuGet
+        run: >
+          dotnet nuget push "${{ github.workspace }}/artifacts/*.nupkg"
+          --api-key ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
+          --source https://api.nuget.org/v3/index.json
+          --skip-duplicate
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >
+          gh release create "$GITHUB_REF_NAME"
+          "${{ github.workspace }}"/artifacts/*.nupkg
+          --title "$GITHUB_REF_NAME"
+          --generate-notes
